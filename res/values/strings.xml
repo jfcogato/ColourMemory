@@ -6,8 +6,8 @@
     <string name="action_settings">Settings</string>
     <string name="points">Points</string>
     <string name="score_button">Scores</string>
-    <string name="popup_text">Congratulation!!! what\'s your name?</string>
-    <string name="popup_header">Score: </string>
+    <string name="popup_text">Congratulations!!! what\'s your name?</string>
+    <string name="popup_header">Your Score: </string>
     <string name="cero">0</string>
 
 </resources>

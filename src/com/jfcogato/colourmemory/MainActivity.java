@@ -94,7 +94,7 @@ public class MainActivity extends Activity {
 	public void shotPopup(final int points) {
 
 		// for this popup I got no time to create a cute dialog, I made all the
-		// app in less that 8 hours, so please take that on mind. Thanks.
+		// app in less that 6 hours, so please take that on mind. Thanks.
 		final EditText input = new EditText(this);
 		new AlertDialog.Builder(this)
 				.setTitle(getString(R.string.popup_header) + points)
