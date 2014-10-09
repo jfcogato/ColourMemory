@@ -4,23 +4,35 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import com.jfcogato.colourmemory.DAO.DataBasesAccess;
 import com.jfcogato.colourmemory.adapters.ImageAdapter;
+import com.jfcogato.colourmemory.models.UsersObject;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.text.Editable;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends Activity {
-	
+
 	public TextView pointsValue = null;
+	public float density = 1.0f;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -28,7 +40,7 @@ public class MainActivity extends Activity {
 		setContentView(R.layout.activity_main);
 
 		pointsValue = (TextView) findViewById(R.id.points_value);
-		
+
 		// First we create an aux list with the object repeated
 		ArrayList<Integer> listObject = new ArrayList<Integer>();
 
@@ -55,18 +67,55 @@ public class MainActivity extends Activity {
 		}
 
 		// On randomList we have the order to paint the cards
-		GridView gridview = (GridView) findViewById(R.id.gridview);// crear el
-		// gridview a partir del elemento del xml gridview
+		GridView gridview = (GridView) findViewById(R.id.gridview);
 
 		ImageAdapter adapter = new ImageAdapter(this, randomList);
-		gridview.setAdapter(adapter);// con setAdapter se llena
-		// el gridview con datos. en
-		// este caso un nuevo objeto de la clase ImageAdapter,
-		// que está definida en otro archivo
-		// para que detecte la pulsación se le añade un listener de itemClick
-		// que recibe un OniTemClickListener creado con new
-
+		gridview.setAdapter(adapter);
 		gridview.setOnItemClickListener(adapter);
+		
+		Button scoreButton = (Button) this.findViewById(R.id.score_button);
+		scoreButton.setOnClickListener(new OnClickListener(){
 
+			@Override
+			public void onClick(View v) {
+				startScoreList();
+			}
+			
+		});
+	}
+	
+	public void startScoreList(){
+		Intent i = new Intent(getApplicationContext(), ScoreListActivity.class);				
+		startActivity(i);
+	}
+
+	public void shotPopup(final int points) {
+
+		final EditText input = new EditText(this);
+		int padding = Math.round(16 * density);
+		input.setPadding(padding, padding, padding, padding);
+
+		new AlertDialog.Builder(this)
+				.setTitle(getString(R.string.popup_header))
+				.setMessage(getString(R.string.popup_text)).setView(input)
+				.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) {
+
+						if (input.getText().length() == 0) {
+							shotPopup(points);
+						} else {
+							UsersObject score = new UsersObject();
+							score.setName(String.valueOf(input.getText()));
+							score.setPoints(String.valueOf(points));
+
+							DataBasesAccess
+									.getInstance(getApplicationContext())
+									.setUser(score);
+							
+							startScoreList();
+						}
+
+					}
+				}).show();
 	}
 }

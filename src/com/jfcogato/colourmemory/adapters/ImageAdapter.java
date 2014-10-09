@@ -167,7 +167,7 @@ public class ImageAdapter extends BaseAdapter implements OnItemClickListener {
 
 				// Check if all the cards was finds
 				if (colors == 0) {
-					Log.d("hello", "you finish");
+					((MainActivity) mContext).shotPopup(points);
 				}
 				setOnAnimation(false);
 			}

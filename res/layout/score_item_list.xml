@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content" 
+    android:padding="8dip">
+    
+    <TextView
+        android:id="@+id/ranking"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="0" 
+        android:layout_marginRight="8dip"/>
+
+    <TextView
+        android:id="@+id/name"
+        android:layout_toRightOf="@id/ranking"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="80dip"
+        android:ellipsize="end"
+        android:gravity="left"
+        android:lines="1" />
+
+    <TextView
+        android:id="@+id/points"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_gravity="right"
+        android:ellipsize="end" />
+
+</RelativeLayout>

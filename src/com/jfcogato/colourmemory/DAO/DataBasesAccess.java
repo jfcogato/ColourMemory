@@ -2,21 +2,21 @@ package com.jfcogato.colourmemory.DAO;
 
 import java.util.ArrayList;
 
-import com.example.rsspanda.model.NewsObject;
+import com.jfcogato.colourmemory.models.UsersObject;
 
 import android.content.Context;
 
 public class DataBasesAccess {
 
 	private static DataBasesAccess classAccess = null;
-	private static NewsDataBaseAdapter dbNews = null;
+	private static UsersDataBaseAdapter dbUsers = null;
 
 	private static String createInstance = "";
 
 	// label to only let one instance to access the same database, if we have
 	// more databases we could creat more label like this, and acces to boths
 	// database at the same time
-	private static String accessNews = "";
+	private static String accessUsers = "";
 
 	public static DataBasesAccess getInstance(Context ctx) {
 
@@ -25,30 +25,24 @@ public class DataBasesAccess {
 			synchronized (createInstance) {
 				if (classAccess == null) {
 					classAccess = new DataBasesAccess();
-					dbNews = new NewsDataBaseAdapter(
+					dbUsers = new UsersDataBaseAdapter(
 							ctx.getApplicationContext());
-					dbNews.open();
+					dbUsers.open();
 				}
 			}
 		}
 		return classAccess;
 	}
 
-	public ArrayList<NewsObject> getNews() {
-		synchronized (accessNews) {
-			return dbNews.getAllEntriesParsed();
+	public ArrayList<UsersObject> getUsers() {
+		synchronized (accessUsers) {
+			return dbUsers.getAllEntriesParsed();
 		}
 	}
 
-	public void deleteNewsDataBase() {
-		synchronized (accessNews) {
-			dbNews.removeAll();
-		}
-	}
-
-	public void setNews(NewsObject newsObject) {
-		synchronized (accessNews) {
-			dbNews.insertEntry(newsObject);
+	public void setUser(UsersObject userObject) {
+		synchronized (accessUsers) {
+			dbUsers.insertEntry(userObject);
 		}
 	}
 }

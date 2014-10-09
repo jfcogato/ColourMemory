@@ -2,7 +2,7 @@ package com.jfcogato.colourmemory.DAO;
 
 import java.util.ArrayList;
 
-import com.example.rsspanda.model.NewsObject;
+import com.jfcogato.colourmemory.models.UsersObject;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -12,50 +12,39 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.database.sqlite.SQLiteOpenHelper;
 
-public class NewsDataBaseAdapter {
+public class UsersDataBaseAdapter {
 
-	private static final String DATABASE_NAME = "News.db";
-	private static final String DATABASE_TABLE = "news";
-	private static final int DATABASE_VERSION = 1;
+	private static final String DATABASE_NAME = "Users.db";
+	private static final String DATABASE_TABLE = "users";
+	private static final int DATABASE_VERSION = 2;
 
 	// the index key column name for use in where clauses.
 	public static final String KEY_ID = "_id";
 
 	// the name and column index of each column in your database
-	public static final String KEY_TITLE = "title";
-	public static final int TITLE_COLUMN = 1;
+	public static final String KEY_NAME = "name";
+	public static final int NAME_COLUMN = 1;
 
-	public static final String KEY_DESCRIPTION = "description";
-	public static final int DESCRIPTION_COLUMN = 2;
-
-	public static final String KEY_LINK = "link";
-	public static final int LINK_COLUMN = 3;
-
-	public static final String KEY_CONTENT = "content";
-	public static final int CONTENT_COLUMN = 4;
-
-	public static final String KEY_PICTURE = "picture";
-	public static final int PICTURE_COLUMN = 5;
+	public static final String KEY_POINTS = "points";
+	public static final int POINTS_COLUMN = 2;
 
 	// SQL statemen to create a new dabase.
 	private static final String DATABASE_CREATE = "create table "
 			+ DATABASE_TABLE + " (" + KEY_ID
-			+ " integer privamry key autoincremente, " + KEY_TITLE
-			+ " text not null, " + KEY_DESCRIPTION + " text not null, "
-			+ KEY_LINK + " text not null, " + KEY_CONTENT + " text not null, "
-			+ KEY_PICTURE + " text not null" + ");";
+			+ " integer privamry key autoincremente, " + KEY_NAME
+			+ " text not null, " + KEY_POINTS + " real not null " + ");";
 
 	private SQLiteDatabase db;
 	private final Context context;
 	public myDbHelper dbHelper;
 
-	public NewsDataBaseAdapter(Context _context) {
+	public UsersDataBaseAdapter(Context _context) {
 		context = _context;
 		dbHelper = new myDbHelper(context, DATABASE_NAME, null,
 				DATABASE_VERSION);
 	}
 
-	public NewsDataBaseAdapter open() throws SQLException {
+	public UsersDataBaseAdapter open() throws SQLException {
 		db = dbHelper.getWritableDatabase();
 		return this;
 	}
@@ -64,24 +53,14 @@ public class NewsDataBaseAdapter {
 		db.close();
 	}
 
-	public int insertEntry(NewsObject newsObject) {
+	public int insertEntry(UsersObject newsObject) {
 		int index = 0;
 
-		String strFilter = KEY_DESCRIPTION + "=" + "\"" + newsObject.getTitle() + "\"" ;
-
 		ContentValues newValues = new ContentValues();
-		newValues.put(KEY_TITLE, newsObject.getTitle());
-		newValues.put(KEY_DESCRIPTION, newsObject.getDescription());
-		newValues.put(KEY_LINK, newsObject.getLink());
-		newValues.put(KEY_CONTENT, newsObject.getContent());
-		newValues.put(KEY_PICTURE, newsObject.getPicture());
+		newValues.put(KEY_NAME, newsObject.getName());
+		newValues.put(KEY_POINTS, newsObject.getPoints());
 
-		//Filt to don't store the same news twices
-		int nRowsEffected = db.update(DATABASE_TABLE, newValues, strFilter,
-				null);
-		if (nRowsEffected == 0) {
-			db.insert(DATABASE_TABLE, null, newValues);
-		}
+		db.insert(DATABASE_TABLE, null, newValues);
 
 		return index;
 	}
@@ -100,23 +79,19 @@ public class NewsDataBaseAdapter {
 	}
 
 	public Cursor getAllEntries() {
-		return db.query(DATABASE_TABLE, new String[] { KEY_ID, KEY_TITLE,
-				KEY_DESCRIPTION, KEY_LINK, KEY_CONTENT, KEY_PICTURE }, null,
-				null, null, null, null);
+		return db.query(DATABASE_TABLE, new String[] { KEY_ID, KEY_NAME,
+				KEY_POINTS }, null,
+				null, null, null, KEY_POINTS+" DESC");
 	}
 
-	public ArrayList<NewsObject> getAllEntriesParsed() {
-		ArrayList<NewsObject> list = new ArrayList<NewsObject>();
+	public ArrayList<UsersObject> getAllEntriesParsed() {
+		ArrayList<UsersObject> list = new ArrayList<UsersObject>();
 		Cursor cursor = getAllEntries();
 		if (cursor.moveToFirst())
 			do {
-				NewsObject news = new NewsObject();
-				news.setTitle(cursor.getString(TITLE_COLUMN));
-				news.setDescription(cursor.getString(DESCRIPTION_COLUMN));
-				news.setLink(cursor.getString(LINK_COLUMN));
-				news.setContent(cursor.getString(CONTENT_COLUMN));
-				news.setPicture(cursor.getString(PICTURE_COLUMN));
-
+				UsersObject news = new UsersObject();
+				news.setName(cursor.getString(NAME_COLUMN));
+				news.setPoints(cursor.getString(POINTS_COLUMN));
 				list.add(news);
 			} while (cursor.moveToNext());
 		cursor.close();
