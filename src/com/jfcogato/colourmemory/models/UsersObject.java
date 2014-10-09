@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 public class UsersObject implements Serializable {
 
+	//I made it serializable for future features, if we need to pass the userObject between activities
 	private static final long serialVersionUID = -7060210544600464481L;
 
 	private String name = "";

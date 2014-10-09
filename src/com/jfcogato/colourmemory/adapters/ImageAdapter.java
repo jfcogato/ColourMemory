@@ -20,64 +20,52 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-//un BaseAdapter puede usarse para un Adapter en un listview o gridview
-// hay que implementar algunos métodos heredados de la clase Adapter,
-//porque BaseAdapter es una subclase de Adapter
-// estos métodos en este ejemplo son:  getCount(), getItem(), getItemId(), getView()
 public class ImageAdapter extends BaseAdapter implements OnItemClickListener {
 
 	private Context mContext;
 	ArrayList<Integer> randomList = new ArrayList<Integer>();
 	int points = 0;
 	int colors = 0;
-	
-	boolean onAnimation = false;
 
+	boolean onAnimation = false;
 	private View lastCardView = null;
 
-	// el constructor necesita el contexto de la actividad donde se utiliza el
-	// adapter
 	public ImageAdapter(Context c, ArrayList<Integer> list) {
 		mContext = c;
 		randomList = list;
+
+		// We get the colors of the cards to count the number of matches, if we
+		// add more colors, this adapter
+		// will works without changes
 		colors = list.size() / 2;
 	}
-	
+
+	// We set the onAnimation var to synchronized value, to only be access by
+	// one process at the same time, with this, we fix problems with the
+	// animation and fast clicks on the cards
 	public synchronized boolean inOnAnimation() {
 		return onAnimation;
 	}
-	
+
 	public synchronized void setOnAnimation(boolean isAnimated) {
 		onAnimation = isAnimated;
 	}
 
-	public int getCount() {// devuelve el número de elementos que se introducen
-		// en el adapter
+	public int getCount() {
 		return randomList.size();
 	}
 
 	public Object getItem(int position) {
-		// este método debería devolver el objeto que esta en esa posición del
-		// adapter. No es necesario en este caso más que devolver un objeto
-		// null.
 		return null;
 	}
 
 	public long getItemId(int position) {
-		// este método debería devolver el id de fila del item que esta en esa
-		// posición del adapter. No es necesario en este caso más que devolver
-		// 0.
 		return 0;
 	}
 
-	// crear un nuevo ImageView para cada item referenciado por el Adapter
 	public View getView(int position, View convertView, ViewGroup parent) {
-		// este método crea una nueva View para cada elemento añadido al
-		// ImageAdapter. Se le pasa el View en el que se ha pulsado, converview
-		// si convertview es null, se instancia y configura un ImageView con las
-		// propiedades deseadas para la presentación de la imagen
-		// si converview no es null, el ImageView local es inicializado con este
-		// objeto View
+		// There is no need to create complex list with holders in this case, so
+		// we made a simple one
 		View view;
 		if (convertView == null) {
 			view = ((Activity) mContext).getLayoutInflater().inflate(
@@ -88,15 +76,17 @@ public class ImageAdapter extends BaseAdapter implements OnItemClickListener {
 
 		((ImageView) view.findViewById(R.id.imageView2))
 				.setImageResource(randomList.get(position));
+		// use the tag to store the position of the view
 		view.setTag(position);
 		return view;
 	}
 
 	@Override
 	public void onItemClick(AdapterView<?> parent, View view, int position,
-			long id) {		
-		
-		if (!inOnAnimation()){
+			long id) {
+
+		// Only one process could pass
+		if (!inOnAnimation()) {
 			setOnAnimation(true);
 			moveCard(view);
 		} else {
@@ -112,17 +102,23 @@ public class ImageAdapter extends BaseAdapter implements OnItemClickListener {
 			View mActualCard = actualCard;
 
 			@Override
-			protected void onPreExecute() {				
+			protected void onPreExecute() {
+				// We animate the card if is not rotated
 				if ((lastCardView == null)
 						|| ((Integer) lastCardView.getTag()).intValue() != ((Integer) mActualCard
 								.getTag()).intValue()) {
-					sendAnimation(mActualCard,true);
+					// The true value, set the animation to know that the color
+					// must be shown
+					sendAnimation(mActualCard, true);
 				}
 			}
 
 			@Override
 			protected Boolean doInBackground(Void... params) {
 				try {
+					// 500 millisecond to wait on background, and 500
+					// milliseconds on animations
+					// made the one second wait at the requirement
 					Thread.sleep(500);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
@@ -133,6 +129,9 @@ public class ImageAdapter extends BaseAdapter implements OnItemClickListener {
 			@Override
 			protected void onPostExecute(Boolean data) {
 
+				// If you don't have a card turned or if user click on the same
+				// card, you don't need to check the
+				// matches
 				if ((lastCardView == null)
 						|| (((Integer) lastCardView.getTag()).intValue() == ((Integer) mActualCard
 								.getTag()).intValue())) {
@@ -145,13 +144,17 @@ public class ImageAdapter extends BaseAdapter implements OnItemClickListener {
 						.get((Integer) mActualCard.getTag());
 				int lastColor = randomList.get((Integer) lastCardView.getTag());
 
-				// match two cards?
+				// cards matches?
 				if (actualColor == lastColor) {
+					// Set the views non cliclables to ensure the user don't
+					// click it again
 					mActualCard.setClickable(false);
 					lastCardView.setClickable(false);
-					mActualCard.setVisibility(View.GONE);
-					lastCardView.setVisibility(View.GONE);
 
+					removeCard(mActualCard);
+					removeCard(lastCardView);
+
+					// remove one color, and set the +2 points
 					points = points + 2;
 					colors = colors - 1;
 				} else {
@@ -161,18 +164,36 @@ public class ImageAdapter extends BaseAdapter implements OnItemClickListener {
 					points = points - 1;
 				}
 
+				// update the points
 				((MainActivity) mContext).pointsValue.setText(String
 						.valueOf(points));
+
+				// Set the last cart to null to know that the matches process
+				// start again
 				lastCardView = null;
 
 				// Check if all the cards was finds
 				if (colors == 0) {
 					((MainActivity) mContext).shotPopup(points);
 				}
+
+				// Reset the synchronous access to let another process to be
+				// done (another click)
 				setOnAnimation(false);
 			}
 
 		}.execute();
+	}
+
+	public void removeCard(View view) {
+		ImageView imageViewFlip = (ImageView) view
+				.findViewById(R.id.imageView2);
+		ImageView imageViewOriginal = (ImageView) view
+				.findViewById(R.id.imageView1);
+
+		imageViewFlip.setVisibility(View.INVISIBLE);
+		imageViewOriginal.setVisibility(View.INVISIBLE);
+
 	}
 
 	public void sendAnimation(View view, boolean visible) {

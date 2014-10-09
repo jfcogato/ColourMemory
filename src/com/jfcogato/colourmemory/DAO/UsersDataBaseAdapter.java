@@ -16,7 +16,7 @@ public class UsersDataBaseAdapter {
 
 	private static final String DATABASE_NAME = "Users.db";
 	private static final String DATABASE_TABLE = "users";
-	private static final int DATABASE_VERSION = 2;
+	private static final int DATABASE_VERSION = 3;
 
 	// the index key column name for use in where clauses.
 	public static final String KEY_ID = "_id";
@@ -56,10 +56,13 @@ public class UsersDataBaseAdapter {
 	public int insertEntry(UsersObject newsObject) {
 		int index = 0;
 
+		// setup the values to be inserted on keys
 		ContentValues newValues = new ContentValues();
 		newValues.put(KEY_NAME, newsObject.getName());
 		newValues.put(KEY_POINTS, newsObject.getPoints());
 
+		// Insert all the data, here there is no matches because you could made
+		// the same points with the same name
 		db.insert(DATABASE_TABLE, null, newValues);
 
 		return index;
@@ -79,9 +82,10 @@ public class UsersDataBaseAdapter {
 	}
 
 	public Cursor getAllEntries() {
+		// Order bye points and descending, to get the order with real numbers (
+		// negative and positive )
 		return db.query(DATABASE_TABLE, new String[] { KEY_ID, KEY_NAME,
-				KEY_POINTS }, null,
-				null, null, null, KEY_POINTS+" DESC");
+				KEY_POINTS }, null, null, null, null, KEY_POINTS + " DESC");
 	}
 
 	public ArrayList<UsersObject> getAllEntriesParsed() {

@@ -46,6 +46,7 @@ public class MainActivity extends Activity {
 		// First we create an aux list with the object repeated
 		ArrayList<Integer> listObject = new ArrayList<Integer>();
 
+		// loop to setup the random cards
 		for (int i = 0; i < 2; i++) {
 			listObject.add(R.drawable.colour1);
 			listObject.add(R.drawable.colour2);
@@ -71,23 +72,24 @@ public class MainActivity extends Activity {
 		// On randomList we have the order to paint the cards
 		GridView gridview = (GridView) findViewById(R.id.gridview);
 
+		// set the adapters
 		ImageAdapter adapter = new ImageAdapter(this, randomList);
 		gridview.setAdapter(adapter);
 		gridview.setOnItemClickListener(adapter);
-		
+
 		Button scoreButton = (Button) this.findViewById(R.id.score_button);
-		scoreButton.setOnClickListener(new OnClickListener(){
+		scoreButton.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
 				startScoreList();
 			}
-			
+
 		});
 	}
-	
-	public void startScoreList(){
-		Intent i = new Intent(getApplicationContext(), ScoreListActivity.class);				
+
+	public void startScoreList() {
+		Intent i = new Intent(getApplicationContext(), ScoreListActivity.class);
 		startActivity(i);
 	}
 
@@ -98,22 +100,28 @@ public class MainActivity extends Activity {
 		input.setPadding(padding, padding, padding, padding);
 
 		new AlertDialog.Builder(this)
-				.setTitle(getString(R.string.popup_header))
+				.setTitle(getString(R.string.popup_header) + points)
 				.setMessage(getString(R.string.popup_text)).setView(input)
 				.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
 
 						if (input.getText().length() == 0) {
+							// If user don't type a valid name, we relaunch the
+							// popup
 							shotPopup(points);
 						} else {
+
+							// We prepare the user object
 							UsersObject score = new UsersObject();
 							score.setName(String.valueOf(input.getText()));
 							score.setPoints(String.valueOf(points));
 
+							// secure access to database to store the data
 							DataBasesAccess
 									.getInstance(getApplicationContext())
 									.setUser(score);
-							
+
+							// launch the score list activity
 							startScoreList();
 						}
 

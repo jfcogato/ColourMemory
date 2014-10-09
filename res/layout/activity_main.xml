@@ -21,7 +21,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_margin="16dip"
             android:layout_weight="1"
             android:orientation="horizontal" >
 
@@ -35,8 +34,8 @@
                 android:id="@+id/points_value"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="8dip"
-                android:text="0" />
+                android:layout_marginLeft="@dimen/points_value_margin"
+                android:text="@string/cero" />
         </LinearLayout>
 
         <Button
@@ -44,7 +43,7 @@
             android:layout_width="wrap_content"
             android:layout_height="45dip"
             android:layout_gravity="center"
-            android:layout_marginRight="16dip"
+            android:layout_marginRight="@dimen/score_button_margin"
             android:layout_weight="1"
             android:text="@string/score_button" />
     </LinearLayout>

@@ -2,21 +2,20 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content" 
-    android:padding="8dip">
+    android:padding="@dimen/score_items_margin">
     
     <TextView
         android:id="@+id/ranking"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="0" 
-        android:layout_marginRight="8dip"/>
+        android:layout_marginRight="@dimen/score_items_margin"/>
 
     <TextView
         android:id="@+id/name"
         android:layout_toRightOf="@id/ranking"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_marginRight="80dip"
+        android:layout_marginRight="@dimen/margin_between_points_and_name"
         android:ellipsize="end"
         android:gravity="left"
         android:lines="1" />

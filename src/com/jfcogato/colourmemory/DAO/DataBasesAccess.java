@@ -14,7 +14,7 @@ public class DataBasesAccess {
 	private static String createInstance = "";
 
 	// label to only let one instance to access the same database, if we have
-	// more databases we could creat more label like this, and acces to boths
+	// more databases we could create more label like this, and access to both
 	// database at the same time
 	private static String accessUsers = "";
 

@@ -22,6 +22,7 @@ public class ScoreListActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_score);
 
+		// The access to the databases must be done out of the main thread
 		LoadDataBase();
 	}
 
@@ -31,13 +32,13 @@ public class ScoreListActivity extends Activity {
 
 			@Override
 			protected void onPreExecute() {
-				
+
 			}
 
 			@Override
 			protected ArrayList<UsersObject> doInBackground(Void... params) {
-
-				ArrayList<UsersObject> list = DataBasesAccess.getInstance(getApplicationContext()).getUsers();
+				ArrayList<UsersObject> list = DataBasesAccess.getInstance(
+						getApplicationContext()).getUsers();
 				return list;
 
 			}
@@ -45,6 +46,7 @@ public class ScoreListActivity extends Activity {
 			@Override
 			protected void onPostExecute(ArrayList<UsersObject> result) {
 				list = result;
+				// When we have all the data, we can set the adapters and lists
 				setAdapterData();
 			}
 
