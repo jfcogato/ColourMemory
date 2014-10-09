@@ -116,10 +116,16 @@ public class ImageAdapter extends BaseAdapter implements OnItemClickListener {
 			@Override
 			protected Boolean doInBackground(Void... params) {
 				try {
-					// 500 millisecond to wait on background, and 500
-					// milliseconds on animations
-					// made the one second wait at the requirement
-					Thread.sleep(500);
+					// If there are two cards turned, we wait 1 second to let
+					// the user see the match, if not, we wait for the animation be completed
+					if ((lastCardView == null)
+							|| (((Integer) lastCardView.getTag()).intValue() == ((Integer) mActualCard
+									.getTag()).intValue())) {
+						Thread.sleep(500);
+					} else {
+						Thread.sleep(1000);
+					}
+
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}

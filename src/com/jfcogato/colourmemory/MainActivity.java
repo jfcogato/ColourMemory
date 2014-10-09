@@ -3,11 +3,10 @@ package com.jfcogato.colourmemory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-
 import com.jfcogato.colourmemory.DAO.DataBasesAccess;
 import com.jfcogato.colourmemory.adapters.ImageAdapter;
 import com.jfcogato.colourmemory.models.UsersObject;
-
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -33,7 +32,6 @@ import android.widget.Toast;
 public class MainActivity extends Activity {
 
 	public TextView pointsValue = null;
-	public float density = 1.0f;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -95,10 +93,9 @@ public class MainActivity extends Activity {
 
 	public void shotPopup(final int points) {
 
+		// for this popup I got no time to create a cute dialog, I made all the
+		// app in less that 8 hours, so please take that on mind. Thanks.
 		final EditText input = new EditText(this);
-		int padding = Math.round(16 * density);
-		input.setPadding(padding, padding, padding, padding);
-
 		new AlertDialog.Builder(this)
 				.setTitle(getString(R.string.popup_header) + points)
 				.setMessage(getString(R.string.popup_text)).setView(input)
