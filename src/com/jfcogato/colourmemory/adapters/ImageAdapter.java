@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import com.jfcogato.colourmemory.MainActivity;
 import com.jfcogato.colourmemory.R;
+import com.jfcogato.colourmemory.utils.FlipAnimator;
 
 import android.app.Activity;
 import android.content.Context;
@@ -29,6 +30,8 @@ public class ImageAdapter extends BaseAdapter implements OnItemClickListener {
 	ArrayList<Integer> randomList = new ArrayList<Integer>();
 	int points = 0;
 	int colors = 0;
+	
+	boolean onAnimation = false;
 
 	private View lastCardView = null;
 
@@ -38,6 +41,14 @@ public class ImageAdapter extends BaseAdapter implements OnItemClickListener {
 		mContext = c;
 		randomList = list;
 		colors = list.size() / 2;
+	}
+	
+	public synchronized boolean inOnAnimation() {
+		return onAnimation;
+	}
+	
+	public synchronized void setOnAnimation(boolean isAnimated) {
+		onAnimation = isAnimated;
 	}
 
 	public int getCount() {// devuelve el número de elementos que se introducen
@@ -67,38 +78,30 @@ public class ImageAdapter extends BaseAdapter implements OnItemClickListener {
 		// propiedades deseadas para la presentación de la imagen
 		// si converview no es null, el ImageView local es inicializado con este
 		// objeto View
-		ImageView imageView;
+		View view;
 		if (convertView == null) {
-
-			imageView = new ImageView(mContext);
-			imageView.setLayoutParams(new GridView.LayoutParams(200, 200));// ancho
-			// y alto
-			imageView.setPadding(8, 0, 8, 0);
+			view = ((Activity) mContext).getLayoutInflater().inflate(
+					R.layout.card, null);
 		} else {
-			imageView = (ImageView) convertView;
+			view = (View) convertView;
 		}
 
-		// imageView.setImageResource(randomList.get(position));
-		imageView.setImageResource(R.drawable.card_bg);
-		imageView.setTag(position);
-		return imageView;
+		((ImageView) view.findViewById(R.id.imageView2))
+				.setImageResource(randomList.get(position));
+		view.setTag(position);
+		return view;
 	}
 
 	@Override
 	public void onItemClick(AdapterView<?> parent, View view, int position,
-			long id) {
-
-		// if (!onCheck) {
-		// cardView = view;
-		// // ((ImageView)view).setImageResource(randomList.get(position));
-		// onCheck = true;
-		// } else {
-		// // ((ImageView)view).setImageResource(R.drawable.card_bg);
-		// // ((ImageView)cardView).setImageResource(R.drawable.card_bg);
-		// onCheck = false;
-		// }
-
-		moveCard(view);
+			long id) {		
+		
+		if (!inOnAnimation()){
+			setOnAnimation(true);
+			moveCard(view);
+		} else {
+			Log.d("Animation on process", "you can not click");
+		}
 
 	}
 
@@ -109,15 +112,18 @@ public class ImageAdapter extends BaseAdapter implements OnItemClickListener {
 			View mActualCard = actualCard;
 
 			@Override
-			protected void onPreExecute() {
-				((ImageView) mActualCard).setImageResource(randomList
-						.get((Integer) mActualCard.getTag()));
+			protected void onPreExecute() {				
+				if ((lastCardView == null)
+						|| ((Integer) lastCardView.getTag()).intValue() != ((Integer) mActualCard
+								.getTag()).intValue()) {
+					sendAnimation(mActualCard,true);
+				}
 			}
 
 			@Override
 			protected Boolean doInBackground(Void... params) {
 				try {
-					Thread.sleep(1000);
+					Thread.sleep(500);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
@@ -131,6 +137,7 @@ public class ImageAdapter extends BaseAdapter implements OnItemClickListener {
 						|| (((Integer) lastCardView.getTag()).intValue() == ((Integer) mActualCard
 								.getTag()).intValue())) {
 					lastCardView = mActualCard;
+					setOnAnimation(false);
 					return;
 				}
 
@@ -140,27 +147,47 @@ public class ImageAdapter extends BaseAdapter implements OnItemClickListener {
 
 				// match two cards?
 				if (actualColor == lastColor) {
-					((ImageView) mActualCard).setVisibility(View.INVISIBLE);
-					((ImageView) lastCardView).setVisibility(View.INVISIBLE);
+					mActualCard.setClickable(false);
+					lastCardView.setClickable(false);
+					mActualCard.setVisibility(View.GONE);
+					lastCardView.setVisibility(View.GONE);
+
 					points = points + 2;
-					colors = colors -1;
+					colors = colors - 1;
 				} else {
-					((ImageView) mActualCard)
-							.setImageResource(R.drawable.card_bg);
-					((ImageView) lastCardView)
-							.setImageResource(R.drawable.card_bg);
+					sendAnimation(mActualCard, false);
+					sendAnimation(lastCardView, false);
+
 					points = points - 1;
 				}
-				
-				((MainActivity)mContext).pointsValue.setText(String.valueOf(points));
+
+				((MainActivity) mContext).pointsValue.setText(String
+						.valueOf(points));
 				lastCardView = null;
-				
-				//Check if all the cards was finds
-				if (colors == 0){
+
+				// Check if all the cards was finds
+				if (colors == 0) {
 					Log.d("hello", "you finish");
 				}
+				setOnAnimation(false);
 			}
 
 		}.execute();
+	}
+
+	public void sendAnimation(View view, boolean visible) {
+		ImageView imageViewFlip = (ImageView) view
+				.findViewById(R.id.imageView2);
+		ImageView imageViewOriginal = (ImageView) view
+				.findViewById(R.id.imageView1);
+
+		FlipAnimator animator = new FlipAnimator(imageViewOriginal,
+				imageViewFlip, imageViewFlip.getWidth() / 2,
+				imageViewFlip.getHeight() / 2);
+
+		if (!visible) {
+			animator.reverse();
+		}
+		view.startAnimation(animator);
 	}
 }
